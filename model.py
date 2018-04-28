@@ -121,12 +121,11 @@ for epoch in range(training_epochs):
             noise = make_noise(sample_size, noise_n)
             samples = sess.run(G, feed_dict={Z: noise})
 
-            samples = tf.reshape(tf.cast(samples, tf.uint8), [-1,28,28,1])
+            samples = tf.reshape(tf.cast(samples*128, tf.uint8), [-1,28,28,1])
 
             for j in range(sample_size):
                 img = tf.image.encode_jpeg(samples[j], format='grayscale')
-                fmt = '%Y%m%d%H%M%S'
-                temp_name = datetime.datetime.now().strftime(fmt) + "_" + str(epoch) + ".jpeg"
+                temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
                 fname = tf.constant(temp_name)
                 fsave = tf.write_file(fname,img)
                 sess.run(fsave)
