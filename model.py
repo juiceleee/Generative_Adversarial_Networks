@@ -99,7 +99,7 @@ G_train = tf.train.AdamOptimizer(learning_rate).minimize(-G_loss, var_list = G_v
 samples = Generator(Y)
 samples_img = tf.reshape(tf.cast(samples*128, tf.uint8), [-1,28,28,1])
 img = tf.image.encode_jpeg(tf.reshape(samples_img,[28,28,1]), format='grayscale')
-temp_name = tf.constant("./testimages")+E+tf.constant("_")+J+tf.constant(".jpeg") 
+temp_name = tf.constant("./testimages/")+E+tf.constant("_")+J+tf.constant(".jpeg") 
 fsave = tf.write_file(temp_name,img)
 
 
