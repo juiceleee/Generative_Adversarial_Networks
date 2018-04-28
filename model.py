@@ -117,16 +117,13 @@ for epoch in range(training_epochs):
             noise = make_noise(sample_size, noise_n)
             samples = sess.run(G, feed_dict={Z: noise})
 
-            fig, ax = plt.subplots(1, sample_size, figsize=(sample_size, 1))
+            samples = tf.reshape(samples, [-1,28,28,1])
 
-            '''
-            for i in range(sample_size):
-                ax[i].set_axis_off()
-                ax[i].imshow(np.reshape(samples[i], (28, 28)))
-            '''
+            for j in range(sample_size):
+                img = tf.image.encode_jpeg(samples[j], format=grayscale)
+                fname = tf.constant(str(datetime.now()) +str(epoch) ".jpeg")
+                tf.write_file(fname,img)
 
-            plt.savefig('samples/{}.png'.format(str(epoch).zfill(3)), bbox_inches='tight')
-            plt.close(fig)
 
 print('Learning finished')
 
