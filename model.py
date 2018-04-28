@@ -41,10 +41,10 @@ b3_g = tf.Variable(tf.random_normal([784]))
 G_var_list = [W1_g, b1_g, W2_g, b2_g, W3_g, b3_g]
 
 
-def Generator(Z):
+def Generator(Zin):
 
     # Layer 1 : FC
-    L1 = tf.nn.relu(tf.matmul(Z, W1_g) + b1_g)
+    L1 = tf.nn.relu(tf.matmul(Zin, W1_g) + b1_g)
 
     # Layer 2 : FC
     L2 = tf.nn.relu(tf.matmul(L1, W2_g) + b2_g)
