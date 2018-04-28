@@ -9,7 +9,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
 
-learning_rate = 0.001
+learning_rate = 0.0002
 training_epochs = 1000
 batch_size = 100
 noise_n = 100
