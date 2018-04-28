@@ -129,7 +129,7 @@ for epoch in range(training_epochs):
                 temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
                 fname = tf.constant(temp_name)
                 fsave = tf.write_file(fname,img)
-                sess.run(fsave)
+                sess.run(fsave, feed_dict={Y:sample_noise})
             
             flag = 0
 
