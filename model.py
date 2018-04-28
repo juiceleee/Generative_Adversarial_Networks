@@ -121,7 +121,7 @@ for epoch in range(training_epochs):
 
             for j in range(sample_size):
                 img = tf.image.encode_jpeg(samples[j], format=grayscale)
-                fname = tf.constant(str(datetime.now()) +str(epoch) ".jpeg")
+                fname = tf.constant('str(datetime.now()) +str(epoch) ".jpeg"')
                 tf.write_file(fname,img)
 
 
