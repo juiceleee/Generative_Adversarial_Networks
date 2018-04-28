@@ -11,7 +11,7 @@ mnist = input_data.read_data_sets("MNIST_data/")
 
 learning_rate = 0.0002
 training_epochs = 1000
-batch_size = 1
+batch_size = 100
 noise_n = 100
 flag = 0
 
@@ -117,9 +117,6 @@ for epoch in range(training_epochs):
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         noise = make_noise(batch_size, noise_n)
 
-        if batch_ys[0] != 5:
-            continue
-
         _, loss_val_D = sess.run([D_train, D_loss], feed_dict={X: batch_xs, Z: noise})
         _, loss_val_G = sess.run([G_train, G_loss], feed_dict={Z: noise})
 
@@ -134,7 +131,7 @@ for epoch in range(training_epochs):
                 # temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
                 # fname = tf.constant("./testimages/"+temp_name)
                 sess.run(fsave, feed_dict={Y:sample_noise, E:str(epoch), J:str(j)})
-            
+
             flag = 0
 
 
