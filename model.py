@@ -117,7 +117,7 @@ for epoch in range(training_epochs):
             noise = make_noise(sample_size, noise_n)
             samples = sess.run(G, feed_dict={Z: noise})
 
-            samples = tf.reshape(samples, [-1,28,28,1])
+            samples = tf.reshape(tf.cast(samples, tf.uint8), [-1,28,28,1])
 
             for j in range(sample_size):
                 img = tf.image.encode_jpeg(samples[j], format='grayscale')
