@@ -124,6 +124,7 @@ for epoch in range(training_epochs):
 
             for j in range(sample_size):
                 sample_noise = make_noise(1, noise_n)
+                print(sample_noise)
                 temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
                 fname = tf.constant("./testimages/"+temp_name)
                 fsave = tf.write_file(fname,img)
