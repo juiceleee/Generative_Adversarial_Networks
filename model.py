@@ -119,9 +119,11 @@ for epoch in range(training_epochs):
 
             fig, ax = plt.subplots(1, sample_size, figsize=(sample_size, 1))
 
+            '''
             for i in range(sample_size):
                 ax[i].set_axis_off()
                 ax[i].imshow(np.reshape(samples[i], (28, 28)))
+            '''
 
             plt.savefig('samples/{}.png'.format(str(epoch).zfill(3)), bbox_inches='tight')
             plt.close(fig)
