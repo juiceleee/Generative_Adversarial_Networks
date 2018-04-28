@@ -103,7 +103,7 @@ total_batch = int(mnist.train.num_examples/batch_size)
 
 for epoch in range(training_epochs):
     for i in range(total_batch):
-        if (epoch + 1) % 10 == 0: or epoch == 0:
+        if (epoch + 1) % 10 == 0 or epoch == 0:
             flag = 1
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         noise = make_noise(batch_size, noise_n)
