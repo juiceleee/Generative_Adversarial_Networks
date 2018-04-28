@@ -12,6 +12,7 @@ learning_rate = 0.001
 training_epochs = 1000
 batch_size = 100
 noise_n = 100
+flag = 0
 
 X = tf.placeholder(tf.float32, [None,784])
 Y = tf.placeholder(tf.float32, [None,1])
@@ -102,6 +103,8 @@ total_batch = int(mnist.train.num_examples/batch_size)
 
 for epoch in range(training_epochs):
     for i in range(total_batch):
+        if (epoch + 1) % 10 == 0: or epoch == 0:
+            flag = 1
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         noise = make_noise(batch_size, noise_n)
 
@@ -112,7 +115,7 @@ for epoch in range(training_epochs):
           'D loss: {:.4}'.format(loss_val_D),
           'G loss: {:.4}'.format(loss_val_G))
 
-        if epoch == 0 or (epoch + 1) % 10 == 0:
+        if flag == 1:
             sample_size = 10
             noise = make_noise(sample_size, noise_n)
             samples = sess.run(G, feed_dict={Z: noise})
@@ -122,7 +125,10 @@ for epoch in range(training_epochs):
             for j in range(sample_size):
                 img = tf.image.encode_jpeg(samples[j], format='grayscale')
                 fname = tf.constant('str(datetime.now()) +str(epoch) ".jpeg"')
-                tf.write_file(fname,img)
+                fsave = tf.write_file(fname,img)
+                sess.run(fsave)
+            
+            flag = 0
 
 
 print('Learning finished')
