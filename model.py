@@ -2,6 +2,7 @@ import tensorflow as tf
 import random
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime
 
 from tensorflow.examples.tutorials.mnist import input_data
 
@@ -124,7 +125,8 @@ for epoch in range(training_epochs):
 
             for j in range(sample_size):
                 img = tf.image.encode_jpeg(samples[j], format='grayscale')
-                temp_name = str(datetime.now()) + str(epoch) + ".jpeg"
+                fmt = '%Y%m%d%H%M%S'
+                temp_name = datetime.datetime.now().strftime(fmt) + "_" + str(epoch) + ".jpeg"
                 fname = tf.constant(temp_name)
                 fsave = tf.write_file(fname,img)
                 sess.run(fsave)
