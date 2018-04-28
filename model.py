@@ -19,21 +19,21 @@ Z = tf.placeholder(tf.float32, [None, 100])
 
 
 # for Discriminator
-W1_d = tf.get_variable("W1", shape = [3,3,1,32], initializer = tf.contrib.layers.xavier_initializer())
-W2_d = tf.get_variable("W2", shape = [3,3,32,64], initializer = tf.contrib.layers.xavier_initializer())
-W3_d = tf.get_variable("W3", shape = [28*28*64, 625], initializer = tf.contrib.layers.xavier_initializer())
+W1_d = tf.get_variable("W1_d", shape = [3,3,1,32], initializer = tf.contrib.layers.xavier_initializer())
+W2_d = tf.get_variable("W2_d", shape = [3,3,32,64], initializer = tf.contrib.layers.xavier_initializer())
+W3_d = tf.get_variable("W3_d", shape = [28*28*64, 625], initializer = tf.contrib.layers.xavier_initializer())
 b3_d = tf.Variable(tf.random_normal([625]))
-W4_d = tf.get_variable("W4", shape = [625, 1], initializer = tf.contrib.layers.xavier_initializer())
+W4_d = tf.get_variable("W4_d", shape = [625, 1], initializer = tf.contrib.layers.xavier_initializer())
 b4_d = tf.Variable(tf.random_normal([1]))
 
 D_var_list = [W1_d, W2_d, W3_d, b3_d, W4_d, b4_d]
 
 # for Generator
-W1_g = tf.get_variable("W1", shape = [noise_n,256], initializer = tf.contrib.layers.xavier_initializer())
+W1_g = tf.get_variable("W1_g", shape = [noise_n,256], initializer = tf.contrib.layers.xavier_initializer())
 b1_g = tf.Variable(tf.random_normal([256]))
-W2_g = tf.get_variable("W2", shape = [256,512], initializer = tf.contrib.layers.xavier_initializer())
+W2_g = tf.get_variable("W2_g", shape = [256,512], initializer = tf.contrib.layers.xavier_initializer())
 b2_g = tf.Variable(tf.random_normal([512]))
-W3_g = tf.get_variable("W3", shape = [512,784], initializer = tf.contrib.layers.xavier_initializer())
+W3_g = tf.get_variable("W3_g", shape = [512,784], initializer = tf.contrib.layers.xavier_initializer())
 b3_g = tf.Variable(tf.random_normal([784]))
 
 G_var_list = [W1_g, b1_g, W2_g, b2_g, W3_g, b3_g]
