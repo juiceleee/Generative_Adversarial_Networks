@@ -18,6 +18,8 @@ flag = 0
 X = tf.placeholder(tf.float32, [None,784])
 Z = tf.placeholder(tf.float32, [None, 100])
 Y = tf.placeholder(tf.float32, [None, 100])
+E = tf.placeholer(tf.string)
+J = tf.placeholer(tf.string)
 
 
 # for Discriminator
@@ -94,6 +96,12 @@ G_loss = tf.reduce_mean(tf.log(D_fake))
 D_train = tf.train.AdamOptimizer(learning_rate).minimize(-D_loss, var_list = D_var_list)
 G_train = tf.train.AdamOptimizer(learning_rate).minimize(-G_loss, var_list = G_var_list)
 
+samples = Generator(Y)
+samples_img = tf.reshape(tf.cast(samples*128, tf.uint8), [-1,28,28,1])
+img = tf.image.encode_jpeg(tf.reshape(samples_img,[28,28,1]), format='grayscale')
+temp_name = tf.constant("./testimages")+E+tf.constant("_")+J+tf.constant(".jpeg") 
+fsave = tf.write_file(temp_name,img)
+
 
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
@@ -118,16 +126,10 @@ for epoch in range(training_epochs):
 
         if flag == 1:
             sample_size = 10
-            samples = Generator(Y)
-            samples_img = tf.reshape(tf.cast(samples*128, tf.uint8), [-1,28,28,1])
-            img = tf.image.encode_jpeg(tf.reshape(samples_img,[28,28,1]), format='grayscale')
-
             for j in range(sample_size):
                 sample_noise = make_noise(1, noise_n)
-                print(sample_noise)
-                temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
-                fname = tf.constant("./testimages/"+temp_name)
-                fsave = tf.write_file(fname,img)
+                #temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
+                #fname = tf.constant("./testimages/"+temp_name)     
                 sess.run(fsave, feed_dict={Y:sample_noise})
             
             flag = 0
