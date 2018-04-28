@@ -114,7 +114,7 @@ for epoch in range(training_epochs):
 
         if epoch == 0 or (epoch + 1) % 10 == 0:
             sample_size = 10
-            noise = get_noise(sample_size, n_noise)
+            noise = make_noise(sample_size, noise_n)
             samples = sess.run(G, feed_dict={Z: noise})
 
             fig, ax = plt.subplots(1, sample_size, figsize=(sample_size, 1))
