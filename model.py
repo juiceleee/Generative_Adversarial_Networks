@@ -16,7 +16,6 @@ noise_n = 100
 flag = 0
 
 X = tf.placeholder(tf.float32, [None,784])
-Y = tf.placeholder(tf.float32, [None,1])
 Z = tf.placeholder(tf.float32, [None, 100])
 
 
@@ -80,7 +79,7 @@ def Discriminator(X):
 
 
 def make_noise(batch_size, noise_n):
-    return np.random.normal(size=(batch_size, noise_n))
+    return np.random.normal(size=[batch_size, noise_n])
 
 
 G = Generator(Z)
@@ -88,11 +87,11 @@ G = Generator(Z)
 D_fake = Discriminator(G)
 D_real = Discriminator(X)
 
-D_loss = -tf.reduce_mean(tf.log(D_real) + tf.log(1-D_fake))
-G_loss = -tf.reduce_mean(tf.log(D_fake))
+D_loss = tf.reduce_mean(tf.log(D_real) + tf.log(1-D_fake))
+G_loss = tf.reduce_mean(tf.log(D_fake))
 
-D_train = tf.train.AdamOptimizer(learning_rate).minimize(D_loss, var_list = D_var_list)
-G_train = tf.train.AdamOptimizer(learning_rate).minimize(G_loss, var_list = G_var_list)
+D_train = tf.train.AdamOptimizer(learning_rate).minimize(-D_loss, var_list = D_var_list)
+G_train = tf.train.AdamOptimizer(learning_rate).minimize(-G_loss, var_list = G_var_list)
 
 
 sess = tf.Session()
@@ -118,13 +117,13 @@ for epoch in range(training_epochs):
 
         if flag == 1:
             sample_size = 10
-            noise = make_noise(sample_size, noise_n)
-            samples = sess.run(G, feed_dict={Z: noise})
+            sample_noise = make_noise(sample_size, noise_n)
+            samples = sess.run(G, feed_dict={Z: sample_noise})
 
-            samples = tf.reshape(tf.cast(samples*128, tf.uint8), [-1,28,28,1])
+            samples_out = tf.reshape(tf.cast(samples*128, tf.uint8), [-1,28,28,1])
 
             for j in range(sample_size):
-                img = tf.image.encode_jpeg(samples[j], format='grayscale')
+                img = tf.image.encode_jpeg(samples_out[j], format='grayscale')
                 temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
                 fname = tf.constant(temp_name)
                 fsave = tf.write_file(fname,img)
