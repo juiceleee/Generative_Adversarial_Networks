@@ -102,9 +102,9 @@ print('Learing Started')
 total_batch = int(mnist.train.num_examples/batch_size)
 
 for epoch in range(training_epochs):
-    for i in range(total_batch):
-        if (epoch + 1) % 10 == 0 or epoch == 0:
+    if (epoch + 1) % 10 == 0 or epoch == 0:
             flag = 1
+    for i in range(total_batch):
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         noise = make_noise(batch_size, noise_n)
 
@@ -124,7 +124,8 @@ for epoch in range(training_epochs):
 
             for j in range(sample_size):
                 img = tf.image.encode_jpeg(samples[j], format='grayscale')
-                fname = tf.constant('str(datetime.now()) +str(epoch) ".jpeg"')
+                temp_name = str(datetime.now()) + str(epoch) + ".jpeg"
+                fname = tf.constant(temp_name)
                 fsave = tf.write_file(fname,img)
                 sess.run(fsave)
             
