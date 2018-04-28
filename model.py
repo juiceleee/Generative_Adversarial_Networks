@@ -6,12 +6,12 @@ import datetime
 
 from tensorflow.examples.tutorials.mnist import input_data
 
-mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
+mnist = input_data.read_data_sets("MNIST_data/")
 
 
 learning_rate = 0.0002
 training_epochs = 1000
-batch_size = 100
+batch_size = 1
 noise_n = 100
 flag = 0
 
@@ -23,21 +23,21 @@ J = tf.placeholder(tf.string)
 
 
 # for Discriminator
-W1_d = tf.get_variable("W1_d", shape = [3,3,1,32], initializer = tf.contrib.layers.xavier_initializer())
-W2_d = tf.get_variable("W2_d", shape = [3,3,32,64], initializer = tf.contrib.layers.xavier_initializer())
-W3_d = tf.get_variable("W3_d", shape = [28*28*64, 625], initializer = tf.contrib.layers.xavier_initializer())
+W1_d = tf.get_variable("W1_d", shape = [3,3,1,32], initializer = tf.random_normal_initializer(mean=0.0, stddev = 0.01))
+W2_d = tf.get_variable("W2_d", shape = [3,3,32,64], initializer = tf.random_normal_initializer(mean=0.0, stddev = 0.01))
+W3_d = tf.get_variable("W3_d", shape = [28*28*64, 625], initializer = tf.random_normal_initializer(mean=0.0, stddev = 0.01))
 b3_d = tf.Variable(tf.random_normal([625]))
-W4_d = tf.get_variable("W4_d", shape = [625, 1], initializer = tf.contrib.layers.xavier_initializer())
+W4_d = tf.get_variable("W4_d", shape = [625, 1], initializer = tf.random_normal_initializer(mean=0.0, stddev = 0.01))
 b4_d = tf.Variable(tf.random_normal([1]))
 
 D_var_list = [W1_d, W2_d, W3_d, b3_d, W4_d, b4_d]
 
 # for Generator
-W1_g = tf.get_variable("W1_g", shape = [noise_n,256], initializer = tf.contrib.layers.xavier_initializer())
+W1_g = tf.get_variable("W1_g", shape = [noise_n,256], initializer = tf.random_normal_initializer(mean=0.0, stddev = 0.01))
 b1_g = tf.Variable(tf.random_normal([256]))
-W2_g = tf.get_variable("W2_g", shape = [256,512], initializer = tf.contrib.layers.xavier_initializer())
+W2_g = tf.get_variable("W2_g", shape = [256,512], initializer = tf.random_normal_initializer(mean=0.0, stddev = 0.01))
 b2_g = tf.Variable(tf.random_normal([512]))
-W3_g = tf.get_variable("W3_g", shape = [512,784], initializer = tf.contrib.layers.xavier_initializer())
+W3_g = tf.get_variable("W3_g", shape = [512,784], initializer = tf.random_normal_initializer(mean=0.0, stddev = 0.01))
 b3_g = tf.Variable(tf.random_normal([784]))
 
 G_var_list = [W1_g, b1_g, W2_g, b2_g, W3_g, b3_g]
@@ -69,7 +69,7 @@ def Discriminator(X):
 
     # Layer 2 : conv
     L2 = tf.nn.conv2d(L1, W2_d, strides=[1,1,1,1], padding = 'SAME')
-    L2 = tf.nn.relu(L1)
+    L2 = tf.nn.relu(L2)
     L2_flat = tf.reshape(L2, [-1, 28*28*64])
 
     # Layer 3 : FC
@@ -117,6 +117,9 @@ for epoch in range(training_epochs):
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         noise = make_noise(batch_size, noise_n)
 
+        if batch_ys[0] != 5:
+            continue
+
         _, loss_val_D = sess.run([D_train, D_loss], feed_dict={X: batch_xs, Z: noise})
         _, loss_val_G = sess.run([G_train, G_loss], feed_dict={Z: noise})
 
@@ -128,8 +131,8 @@ for epoch in range(training_epochs):
             sample_size = 10
             for j in range(sample_size):
                 sample_noise = make_noise(1, noise_n)
-                #temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
-                #fname = tf.constant("./testimages/"+temp_name)     
+                # temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
+                # fname = tf.constant("./testimages/"+temp_name)
                 sess.run(fsave, feed_dict={Y:sample_noise, E:str(epoch), J:str(j)})
             
             flag = 0
