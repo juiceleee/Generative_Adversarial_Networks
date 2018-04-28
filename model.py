@@ -121,11 +121,11 @@ for epoch in range(training_epochs):
             sample_noise = make_noise(sample_size, noise_n)
             samples = Generator(Y)
             samples_img = tf.reshape(tf.cast(samples*128, tf.uint8), [-1,28,28,1])
-            split0, split1, split2, split3, split4 = tf.split(samples_img, num_or_size_splits=5, axis=0)
+            split0, split1, split2, split3, split4 = tf.split(samples_img, num_or_size_splits=sample_size, axis=0)
             samples_list = [split0, split1, split2, split3, split4]
 
             for j in range(sample_size):
-                img = tf.image.encode_jpeg(samples_list[j], format='grayscale')
+                img = tf.image.encode_jpeg(tf.reshape(samples_list[j],[28,28,1]), format='grayscale')
                 temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
                 fname = tf.constant(temp_name)
                 fsave = tf.write_file(fname,img)
