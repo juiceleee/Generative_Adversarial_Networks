@@ -17,6 +17,7 @@ flag = 0
 
 X = tf.placeholder(tf.float32, [None,784])
 Z = tf.placeholder(tf.float32, [None, 100])
+Y = tf.placeholder(tf.float32, [None, 100])
 
 
 # for Discriminator
@@ -116,14 +117,15 @@ for epoch in range(training_epochs):
           'G loss: {:.4}'.format(loss_val_G))
 
         if flag == 1:
-            sample_size = 10
+            sample_size = 5
             sample_noise = make_noise(sample_size, noise_n)
-            samples = sess.run(G, feed_dict={Z: sample_noise})
-
-            samples_out = tf.reshape(tf.cast(samples*128, tf.uint8), [-1,28,28,1])
+            samples = G(Y)
+            samples_img = tf.reshape(tf.cast(samples*128, tf.uint8), [-1,28,28,1])
+            split0, split1, split2, split3, split4 = tf.split(samples_img, num_or_size_splits=5, axis=0)
+            samples_list = [split0, split1, split2, split3, split4]
 
             for j in range(sample_size):
-                img = tf.image.encode_jpeg(samples_out[j], format='grayscale')
+                img = tf.image.encode_jpeg(samples_list[j], format='grayscale')
                 temp_name =  str(epoch) + "_" + str(j) + ".jpeg"
                 fname = tf.constant(temp_name)
                 fsave = tf.write_file(fname,img)
