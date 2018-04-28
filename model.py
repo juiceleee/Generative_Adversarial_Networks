@@ -18,8 +18,8 @@ flag = 0
 X = tf.placeholder(tf.float32, [None,784])
 Z = tf.placeholder(tf.float32, [None, 100])
 Y = tf.placeholder(tf.float32, [None, 100])
-E = tf.placeholer(tf.string)
-J = tf.placeholer(tf.string)
+E = tf.placeholder(tf.string)
+J = tf.placeholder(tf.string)
 
 
 # for Discriminator
