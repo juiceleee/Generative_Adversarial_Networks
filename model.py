@@ -119,7 +119,7 @@ for epoch in range(training_epochs):
         if flag == 1:
             sample_size = 5
             sample_noise = make_noise(sample_size, noise_n)
-            samples = G(Y)
+            samples = Generator(Y)
             samples_img = tf.reshape(tf.cast(samples*128, tf.uint8), [-1,28,28,1])
             split0, split1, split2, split3, split4 = tf.split(samples_img, num_or_size_splits=5, axis=0)
             samples_list = [split0, split1, split2, split3, split4]
