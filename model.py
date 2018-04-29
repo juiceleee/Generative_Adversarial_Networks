@@ -74,6 +74,7 @@ def Discriminator(X):
 
     # Layer 3 : FC
     L3 = tf.nn.relu(tf.matmul(L2_flat,W3_d)+b3_d)
+    L3 = tf.nn.dropout(L3, keep_prob=0.7)
 
     # Layer 4 : FC
     L4 = tf.nn.sigmoid(tf.matmul(L3,W4_d)+b4_d)
@@ -111,7 +112,7 @@ print('Learing Started')
 total_batch = int(mnist.train.num_examples/batch_size)
 
 for epoch in range(training_epochs):
-    if (epoch + 1) % 10 == 0 or epoch == 0:
+    if True : #(epoch + 1) % 10 == 0 or epoch == 0:
             flag = 1
     for i in range(total_batch):
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
