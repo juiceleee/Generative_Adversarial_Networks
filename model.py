@@ -94,6 +94,10 @@ D_real = Discriminator(X)
 D_loss = tf.reduce_mean(tf.log(D_real) + tf.log(1-D_fake))
 G_loss = tf.reduce_mean(tf.log(D_fake))
 
+D_loss_summary = tf.summary.histogram("D_loss",D_loss)
+G_loss_summary = tf.summary.histogram("G_loss",G_loss)
+
+
 D_train = tf.train.AdamOptimizer(learning_rate).minimize(-D_loss, var_list = D_var_list)
 G_train = tf.train.AdamOptimizer(learning_rate).minimize(-G_loss, var_list = G_var_list)
 
@@ -105,6 +109,10 @@ fsave = tf.write_file(temp_name,img)
 
 
 sess = tf.Session()
+summary_merge = tf.summary.merge_all()
+writer = tf.summary.FileWriter("./logs")
+writer.add_graph(sess.graph)
+
 sess.run(tf.global_variables_initializer())
 
 print('Learing Started')
@@ -118,8 +126,8 @@ for epoch in range(training_epochs):
         batch_xs, batch_ys = mnist.train.next_batch(batch_size)
         noise = make_noise(batch_size, noise_n)
 
-        _, loss_val_D = sess.run([D_train, D_loss], feed_dict={X: batch_xs, Z: noise})
-        _, loss_val_G = sess.run([G_train, G_loss], feed_dict={Z: noise})
+        _, loss_val_D, _, loss_val_G, summary = sess.run([D_train, D_loss, G_train, G_loss, summary_merge], feed_dict={X: batch_xs, Z: noise})
+        writer.add_summary(summary, global_step = epoch*training_epochs + i*100)
 
         print('Epoch:', '%04d' % epoch,
           'D loss: {:.4}'.format(loss_val_D),
