@@ -10,9 +10,11 @@ from tensorboardX import SummaryWriter
 
 from tensorflow.examples.tutorials.mnist import input_data
 
+torch.manual_seed(123)
+
 mnist = input_data.read_data_sets("MNIST_data/")
 
-learning_rate = 0.0002
+learning_rate = 0.001
 training_epochs = 1000
 batch_size = 100
 noise_n = 100
