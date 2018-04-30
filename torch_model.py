@@ -5,8 +5,8 @@ import datetime
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import Variable
 from tensorboardX import SummaryWriter
+import os
 
 from tensorflow.examples.tutorials.mnist import input_data
 
@@ -32,14 +32,14 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.pad = nn.ReplicationPad2d(1)
         self.h1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=(3, 3))
-        self.h1.weight.data.normal_(0, 0.01)
+        # self.h1.weight.data.normal_(0, 0.01)
         self.h2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3))
-        self.h2.weight.data.normal_(0, 0.01)
+        # self.h2.weight.data.normal_(0, 0.01)
         self.h3 = nn.Linear(in_features=28 * 28 * 64, out_features=625)
-        self.h3.weight.data.normal_(0, 0.01)
+        # self.h3.weight.data.normal_(0, 0.01)
         self.h4 = nn.Linear(in_features=625, out_features=1)
-        self.h4.weight.data.normal_(0, 0.01)
-        # self.dropout = nn.Dropout(p=0.1)
+        # self.h4.weight.data.normal_(0, 0.01)
+        self.dropout = nn.Dropout(p=0.5)
 
     def forward(self, *input):
         x = input[0]
@@ -54,7 +54,7 @@ class Discriminator(nn.Module):
         x = self.h3.forward(x)
         x = F.relu(x)
         x = self.h4.forward(x)
-        # x = self.dropout.forward(x)
+        x = self.dropout.forward(x)
         x = F.sigmoid(x)
 
         return x
@@ -66,18 +66,22 @@ class Generator(nn.Module):
     def __init__(self):
         super(Generator, self).__init__()
         self.h1 = nn.Linear(noise_n, 256)
-        self.h1.weight.data.normal_(0, 0.01)
+        # self.h1.weight.data.normal_(0, 0.01)
+        self.bn1 = nn.BatchNorm1d(256)
         self.h2 = nn.Linear(256, 512)
-        self.h2.weight.data.normal_(0, 0.01)
+        self.bn2 = nn.BatchNorm1d(512)
+        # self.h2.weight.data.normal_(0, 0.01)
         self.h3 = nn.Linear(512, 784)
-        self.h3.weight.data.normal_(0, 0.01)
+        # self.h3.weight.data.normal_(0, 0.01)
 
     def forward(self, *input):
         x = input[0]
         x = self.h1(x)
         x = F.relu(x)
+        x = self.bn1(x)
         x = self.h2(x)
         x = F.relu(x)
+        x = self.bn2(x)
         x = self.h3(x)
         x = F.sigmoid(x)
         return x
@@ -90,7 +94,7 @@ def make_noise(batch_size, noise_n):
 if __name__ == "__main__":
     G = Generator().cuda()
     D = Discriminator().cuda()
-    opt_G = torch.optim.Adam(G.parameters(), lr=learning_rate*3)
+    opt_G = torch.optim.Adam(G.parameters(), lr=learning_rate)
     # opt_G = torch.optim.RMSprop(G.parameters())
     opt_D = torch.optim.Adam(D.parameters(), lr=learning_rate)
     total_batch = int(mnist.train.num_examples / batch_size)
@@ -100,6 +104,8 @@ if __name__ == "__main__":
 
     for epoch in range(training_epochs):
         for i in range(total_batch):
+            G.train()
+            D.train()
             X, _ = mnist.train.next_batch(batch_size)
             X = torch.Tensor(X).cuda()
             X.requires_grad_()
@@ -126,6 +132,9 @@ if __name__ == "__main__":
             if i % 100 == 0:
                 print("EPOCH : {}, BATCH: {}\n".format(epoch, i), "D_loss : {}, G_loss : {}".format(D_loss, G_loss))
         writer.add_image("Epoch:{}".format(epoch),
-                         torch.reshape(G(torch.unsqueeze(noise[batch_size // 2], 0)), (28, 28)))
+                         torch.reshape(G.eval()(torch.unsqueeze(noise[batch_size // 2], 0)), (28, 28)))
+        os.makedirs('models/{}'.format(now), exist_ok=True)
+        torch.save(D, 'models/{}/D_{}.pt'.format(now, epoch))
+        torch.save(D, 'models/{}/G_{}.pt'.format(now, epoch))
 
     print('Learning finished')
