@@ -11,17 +11,6 @@ import os
 from tensorflow.examples.tutorials.mnist import input_data
 
 # pytorch == 0.4.0
-torch.set_printoptions(profile="full")
-torch.manual_seed(1234)
-
-mnist = input_data.read_data_sets("MNIST_data/")
-
-learning_rate = 0.0002
-training_epochs = 1000
-batch_size = 64
-noise_n = 100
-flag = 0
-
 
 # for Discriminator
 
@@ -92,6 +81,17 @@ def make_noise(batch_size, noise_n):
 
 
 if __name__ == "__main__":
+    torch.set_printoptions(profile="full")
+    torch.manual_seed(1234)
+
+    mnist = input_data.read_data_sets("MNIST_data/")
+
+    learning_rate = 0.0002
+    training_epochs = 1000
+    batch_size = 64
+    noise_n = 100
+    flag = 0
+
     G = Generator().cuda()
     D = Discriminator().cuda()
     opt_G = torch.optim.Adam(G.parameters(), lr=learning_rate)
@@ -135,6 +135,6 @@ if __name__ == "__main__":
                          torch.reshape(G.eval()(torch.unsqueeze(noise[batch_size // 2], 0)), (28, 28)))
         os.makedirs('models/{}'.format(now), exist_ok=True)
         torch.save(D, 'models/{}/D_{}.pt'.format(now, epoch))
-        torch.save(D, 'models/{}/G_{}.pt'.format(now, epoch))
+        torch.save(G, 'models/{}/G_{}.pt'.format(now, epoch))
 
     print('Learning finished')
