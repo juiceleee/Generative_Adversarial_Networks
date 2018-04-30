@@ -1,6 +1,5 @@
 from torch_model import Discriminator, Generator, make_noise
 import torch
-import torchvision.utils
 import cv2
 from PIL import Image
 import numpy as np
@@ -23,7 +22,7 @@ i = 1
 # print(raw_noise)
 results = G1(noise)
 # torchvision.utils.save_image(torch.unsqueeze(results, 1), "results/{}.jpg".format(i))
-im = Image.open('results/individualImage.png')
+# im = Image.open('results/individualImage.png')
 # print(np.reshape(np.mean(np.array(im.getdata(), np.uint8), 1), (28, 28)))
 
 for result in results:
