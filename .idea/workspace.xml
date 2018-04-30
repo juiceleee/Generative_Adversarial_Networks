@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="38e65b3e-9191-4957-8841-63defd9ae643" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/torch_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/torch_model.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -35,8 +34,8 @@
           <file leaf-file-name="torch_model.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/torch_model.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="247">
-                  <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+                <state relative-caret-position="334">
+                  <caret line="124" column="76" lean-forward="true" selection-start-line="124" selection-start-column="76" selection-end-line="124" selection-end-column="76" />
                   <folding>
                     <element signature="e#0#13#0" expanded="true" />
                   </folding>
@@ -48,11 +47,11 @@
       </split-first>
       <split-second>
         <leaf>
-          <file leaf-file-name="model.py" pinned="false" current-in-tab="true">
+          <file leaf-file-name="model.py" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/model.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="659">
-                  <caret line="119" column="45" selection-start-line="119" selection-start-column="45" selection-end-line="119" selection-end-column="45" />
+                <state relative-caret-position="285">
+                  <caret line="39" column="32" selection-start-line="39" selection-start-column="32" selection-end-line="39" selection-end-column="32" />
                   <folding>
                     <element signature="e#0#23#0" expanded="true" />
                   </folding>
@@ -60,20 +59,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="Wavenet.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/../Multi_Lingual_Tacotron/Wavenet.py">
+          <file leaf-file-name="train.py" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/../Anime_GAN/train.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="144">
-                  <caret line="139" column="56" selection-start-line="139" selection-start-column="56" selection-end-line="139" selection-end-column="56" />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="train.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/../Multi_Lingual_Tacotron/train.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="69">
-                  <caret line="36" column="55" selection-start-line="36" selection-start-column="49" selection-end-line="36" selection-end-column="55" />
+                <state relative-caret-position="57">
+                  <caret line="175" column="11" selection-start-line="175" selection-start-column="11" selection-end-line="175" selection-end-column="11" />
                 </state>
               </provider>
             </entry>
@@ -93,6 +83,10 @@
     <findStrings>
       <find>z</find>
       <find>tensor</find>
+      <find>datetime</find>
+      <find>now</find>
+      <find>time</find>
+      <find>D_train</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -102,6 +96,7 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/model.py" />
+        <option value="$PROJECT_DIR$/../Anime_GAN/train.py" />
         <option value="$PROJECT_DIR$/torch_model.py" />
       </list>
     </option>
@@ -154,7 +149,25 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.torch_model">
+    <configuration name="model" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Vanilla_GAN" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/model.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
     <configuration name="torch_model" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Vanilla_GAN" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -173,9 +186,14 @@
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
     </configuration>
+    <list>
+      <item itemvalue="Python.torch_model" />
+      <item itemvalue="Python.model" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.torch_model" />
+        <item itemvalue="Python.model" />
       </list>
     </recent_temporary>
   </component>
@@ -197,7 +215,21 @@
       <option name="project" value="LOCAL" />
       <updated>1525093582640</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added fixed seed">
+      <created>1525093706318</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1525093706318</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Torch -&gt; saturated problem">
+      <created>1525097666573</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1525097666573</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -207,11 +239,11 @@
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12291667" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32980973" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.32980973" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32980973" />
+      <window_info active="true" anchor="bottom" x="609" y="725" width="1920" height="248" id="Terminal" order="7" type="FLOATING" visible="true" weight="0.26215646" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -234,7 +266,9 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Pytorch version of MNIST_GAN" />
-    <option name="LAST_COMMIT_MESSAGE" value="Pytorch version of MNIST_GAN" />
+    <MESSAGE value="Added fixed seed" />
+    <MESSAGE value="Torch -&gt; saturated problem" />
+    <option name="LAST_COMMIT_MESSAGE" value="Torch -&gt; saturated problem" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -252,17 +286,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../Multi_Lingual_Tacotron/Wavenet.py">
+    <entry file="file://$PROJECT_DIR$/../Multi_Lingual_Tacotron/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="139" column="56" selection-start-line="139" selection-start-column="56" selection-end-line="139" selection-end-column="56" />
+        <state relative-caret-position="152">
+          <caret line="18" column="4" lean-forward="true" selection-start-line="18" selection-start-column="4" selection-end-line="19" selection-end-column="76" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../Multi_Lingual_Tacotron/train.py">
+    <entry file="file://$PROJECT_DIR$/../Multi_Lingual_Tacotron/Wavenet.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="69">
-          <caret line="36" column="55" selection-start-line="36" selection-start-column="49" selection-end-line="36" selection-end-column="55" />
+        <state relative-caret-position="209">
+          <caret line="147" column="16" selection-start-line="147" selection-start-column="12" selection-end-line="147" selection-end-column="16" />
         </state>
       </provider>
     </entry>
@@ -276,10 +310,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/../Anime_GAN/train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="175" column="11" selection-start-line="175" selection-start-column="11" selection-end-line="175" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/torch_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="13" lean-forward="true" selection-start-line="13" selection-end-line="13" />
+        <state relative-caret-position="334">
+          <caret line="124" column="76" lean-forward="true" selection-start-line="124" selection-start-column="76" selection-end-line="124" selection-end-column="76" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
           </folding>

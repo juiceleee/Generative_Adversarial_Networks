@@ -108,21 +108,23 @@ if __name__ == "__main__":
             noise.requires_grad_()
 
             opt_D.zero_grad()
-            opt_G.zero_grad()
             D_real = D(X)
             D_fake = D(G(noise))
             D_loss = -(torch.mean(torch.log(D_real) + torch.log(1 - D_fake)))
-            G_loss = -torch.mean(torch.log(D_fake))
             D_loss.backward(retain_graph=True)
+            opt_D.step()
+
+            opt_G.zero_grad()
+            D_fake = D(G(noise))
+            G_loss = -torch.mean(torch.log(D_fake))
             G_loss.backward(retain_graph=True)
             opt_G.step()
-            opt_D.step()
+
             if i % 10 == 0:
                 writer.add_scalar("D_loss", D_loss, i + epoch * total_batch)
                 writer.add_scalar("G_loss", G_loss, i + epoch * total_batch)
             if i % 100 == 0:
                 print("EPOCH : {}, BATCH: {}\n".format(epoch, i), "D_loss : {}, G_loss : {}".format(D_loss, G_loss))
-        print(G(torch.unsqueeze(noise[batch_size // 2], 0)))
         writer.add_image("Epoch:{}".format(epoch),
                          torch.reshape(G(torch.unsqueeze(noise[batch_size // 2], 0)), (28, 28)))
 
