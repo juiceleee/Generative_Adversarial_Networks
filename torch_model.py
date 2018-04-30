@@ -10,13 +10,15 @@ from tensorboardX import SummaryWriter
 
 from tensorflow.examples.tutorials.mnist import input_data
 
-torch.manual_seed(123)
+# pytorch == 0.4.0
+torch.set_printoptions(profile="full")
+torch.manual_seed(1234)
 
 mnist = input_data.read_data_sets("MNIST_data/")
 
-learning_rate = 0.001
+learning_rate = 0.0002
 training_epochs = 1000
-batch_size = 100
+batch_size = 64
 noise_n = 100
 flag = 0
 
@@ -30,10 +32,14 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.pad = nn.ReplicationPad2d(1)
         self.h1 = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=(3, 3))
+        self.h1.weight.data.normal_(0, 0.01)
         self.h2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=(3, 3))
+        self.h2.weight.data.normal_(0, 0.01)
         self.h3 = nn.Linear(in_features=28 * 28 * 64, out_features=625)
+        self.h3.weight.data.normal_(0, 0.01)
         self.h4 = nn.Linear(in_features=625, out_features=1)
-        self.dropout = nn.Dropout(p=0.7)
+        self.h4.weight.data.normal_(0, 0.01)
+        # self.dropout = nn.Dropout(p=0.1)
 
     def forward(self, *input):
         x = input[0]
@@ -48,7 +54,7 @@ class Discriminator(nn.Module):
         x = self.h3.forward(x)
         x = F.relu(x)
         x = self.h4.forward(x)
-        x = self.dropout.forward(x)
+        # x = self.dropout.forward(x)
         x = F.sigmoid(x)
 
         return x
@@ -59,10 +65,12 @@ class Generator(nn.Module):
 
     def __init__(self):
         super(Generator, self).__init__()
-        self.pad = nn.ReplicationPad2d(1)
         self.h1 = nn.Linear(noise_n, 256)
+        self.h1.weight.data.normal_(0, 0.01)
         self.h2 = nn.Linear(256, 512)
+        self.h2.weight.data.normal_(0, 0.01)
         self.h3 = nn.Linear(512, 784)
+        self.h3.weight.data.normal_(0, 0.01)
 
     def forward(self, *input):
         x = input[0]
@@ -82,10 +90,13 @@ def make_noise(batch_size, noise_n):
 if __name__ == "__main__":
     G = Generator().cuda()
     D = Discriminator().cuda()
-    opt_G = torch.optim.Adam(G.parameters(), lr=learning_rate)
+    opt_G = torch.optim.Adam(G.parameters(), lr=learning_rate*3)
+    # opt_G = torch.optim.RMSprop(G.parameters())
     opt_D = torch.optim.Adam(D.parameters(), lr=learning_rate)
     total_batch = int(mnist.train.num_examples / batch_size)
-    writer = SummaryWriter("log_dir")
+    now = datetime.datetime.now()
+    now = '%02d_%02d_%02d_%02d' % (now.month, now.day, now.hour, now.minute)
+    writer = SummaryWriter("log_dir/{}".format(now))
 
     for epoch in range(training_epochs):
         for i in range(total_batch):
@@ -104,13 +115,15 @@ if __name__ == "__main__":
             G_loss = -torch.mean(torch.log(D_fake))
             D_loss.backward(retain_graph=True)
             G_loss.backward(retain_graph=True)
-            opt_D.step()
             opt_G.step()
+            opt_D.step()
             if i % 10 == 0:
-                writer.add_scalar("D_loss", D_loss, i+epoch*total_batch)
-                writer.add_scalar("G_loss", G_loss, i+epoch*total_batch)
+                writer.add_scalar("D_loss", D_loss, i + epoch * total_batch)
+                writer.add_scalar("G_loss", G_loss, i + epoch * total_batch)
             if i % 100 == 0:
                 print("EPOCH : {}, BATCH: {}\n".format(epoch, i), "D_loss : {}, G_loss : {}".format(D_loss, G_loss))
-        writer.add_image("Epoch:{}".format(epoch), torch.reshape(G(noise[0]), (28, 28)))
+        print(G(torch.unsqueeze(noise[batch_size // 2], 0)))
+        writer.add_image("Epoch:{}".format(epoch),
+                         torch.reshape(G(torch.unsqueeze(noise[batch_size // 2], 0)), (28, 28)))
 
     print('Learning finished')
