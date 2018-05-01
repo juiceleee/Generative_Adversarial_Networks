@@ -7,8 +7,8 @@ import numpy as np
 np.set_printoptions(threshold=np.nan, linewidth=np.nan)
 # from tensorflow.examples.tutorials.mnist import input_data
 
-D1 = torch.load("models/05_01_00_36/D_53.pt", map_location=lambda storage, loc: storage)
-G1 = torch.load("models/05_01_00_36/G_53.pt", map_location=lambda storage, loc: storage)
+D1 = torch.load("../models/05_01_00_36/D_53.pt", map_location=lambda storage, loc: storage)
+G1 = torch.load("../models/05_01_00_36/G_53.pt", map_location=lambda storage, loc: storage)
 
 noise_n = 100
 
@@ -29,8 +29,8 @@ for result in results:
     result = torch.reshape(result, (28, 28))
     result = result.detach().cpu().numpy()
     result = result*256//1
-    # print(result)
-    cv2.imwrite("results/{}.jpg".format(i), result)
+    print(result)
+    cv2.imwrite("../results/{}.jpg".format(i), result)
     # im = Image.fromarray(result, 'L')
     # im.save("results/{}.jpg".format(i))
     i += 1
