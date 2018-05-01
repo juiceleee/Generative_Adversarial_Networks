@@ -54,7 +54,7 @@ class Generator(nn.Module):
 
     def __init__(self):
         super(Generator, self).__init__()
-        self.projection = nn.Linear(noise_n, 7*7*16, False)
+        self.projection = nn.Linear(noise_n, 7*7*16, True)
         nn.init.xavier_normal_(self.projection.weight)
         self.h1 = nn.ConvTranspose2d(16, 4, kernel_size=2, stride=2)  # 7,7 -> 14,14
         nn.init.xavier_normal_(self.h1.weight)
@@ -69,7 +69,7 @@ class Generator(nn.Module):
     def forward(self, *input):
         x = input[0]
         x = self.projection(x)
-        x = torch.reshape(x, (-1, 64, 7, 7))
+        x = torch.reshape(x, (-1, 16, 7, 7))
         x = self.h1(x)
         x = F.relu(x)
         x = self.bn1(x)
