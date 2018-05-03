@@ -169,7 +169,7 @@ if __name__ == "__main__":
 
             opt_G.zero_grad()
             D_fake, c_disc, c_cont = D(G(noise, label, code))
-            G_loss = -torch.mean(torch.log(D_fake)) - Lambda * (
+            G_loss = torch.mean(torch.log(1-D_fake)) - Lambda * (
                     torch.mean(label * torch.log(c_disc)) + NLL_Gaussian(c_cont))
             G_loss.backward(retain_graph=True)
             opt_G.step()
@@ -185,6 +185,7 @@ if __name__ == "__main__":
                          torch.reshape(
                              G.eval()(test_noise, one_hot([5]), test_code),
                              (28, 28)))
+        # print(F.mse_loss(torch.argmax(D(X)[1], dim=1), torch.argmax(label, dim=1)))
         os.makedirs('models/{}'.format(now), exist_ok=True)
         torch.save(D, 'models/{}/D_{}.pt'.format(now, epoch))
         torch.save(G, 'models/{}/G_{}.pt'.format(now, epoch))
