@@ -38,14 +38,17 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         fe1 = list()
         pad = nn.ReplicationPad2d(1)
-        lRelu = nn.LeakyReLU(0.2)
+        lRelu = nn.LeakyReLU(0.1)
         fe1.append(pad)
         fe1.append(nn.Conv2d(in_channels=1, out_channels=64, kernel_size=(4, 4), stride=2))
+        fe1.append(nn.LeakyReLU(0.1))
         fe1.append(pad)
         fe1.append(nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(4, 4), stride=2))
+        fe1.append(nn.LeakyReLU(0.1))
         fe1.append(nn.BatchNorm2d(128))
         fe2 = list()
         fe2.append(nn.Linear(in_features=7 * 7 * 128, out_features=1024))
+        fe2.append(nn.LeakyReLU(0.1))
         fe2.append(nn.BatchNorm1d(1024))
         self.FE1 = nn.Sequential(*fe1)
         self.FE2 = nn.Sequential(*fe2)
@@ -54,11 +57,14 @@ class Discriminator(nn.Module):
         q = list()
         q.append(nn.Linear(1024, 128))
         q.append(nn.BatchNorm1d(128))
-        q.append(nn.LeakyReLU(0.2))
+        q.append(nn.LeakyReLU(0.1))
         # q.append(nn.Linear(128, 12))
         self.Q = nn.Sequential(*q)
         self.Q_cont = nn.Sequential(nn.Linear(128, 2), nn.Sigmoid())
         self.Q_disc = nn.Sequential(nn.Linear(128, 10), nn.Softmax(dim=1))
+        for params in self.parameters():
+            if len(params.size()) >= 2:
+                nn.init.xavier_normal_(params.data)
         # 2 for continuous latent codes, 10 for category.
         # For this task, we use 1 ten-dimensional categorical code, 2 continuous
         # latent codes and 62 noise variables, resulting in a concatenated dimension of 74.
@@ -69,6 +75,7 @@ class Discriminator(nn.Module):
         x = self.FE1(x)
         x = torch.reshape(x, (-1, 7 * 7 * 128))
         x = self.FE2(x)
+        # x = F.dropout(x, 0.3)
         D = self.D(x)
         Q = self.Q(x)
         code_cont = self.Q_cont(Q)
@@ -93,7 +100,10 @@ class Generator(nn.Module):
         self.bn3 = nn.BatchNorm2d(64)
         # nn.init.xavier_normal_(self.h1.weight)
         self.h2 = nn.ConvTranspose2d(64, 1, kernel_size=(4, 4), stride=2, padding=1)  # 14,14 -> 28,28
-        nn.init.xavier_normal_(self.h2.weight)
+        # nn.init.xavier_normal_(self.h2.weight)
+        for params in self.parameters():
+            if len(params.size()) >= 2:
+                nn.init.xavier_normal_(params.data)
         # self.bn2 = nn.BatchNorm1d(512)
         # self.h2.weight.data.normal_(0, 0.01)
         # self.h3 = nn.ConvTranspose2d(16, 1, kernel_size=2, stride=2)
@@ -126,7 +136,7 @@ if __name__ == "__main__":
 
     mnist = input_data.read_data_sets("../MNIST_data/")
 
-    Lambda = 1
+    Lambda = 0
     learning_rate = 0.0002
     training_epochs = 1000
     batch_size = 64
@@ -137,11 +147,11 @@ if __name__ == "__main__":
     opt_G = torch.optim.Adam(
         [{'params': G.parameters()}, {'params': D.Q.parameters()},
          {'params': D.Q_disc.parameters()}, {'params': D.Q_cont.parameters()}],
-        lr=learning_rate)
+        lr=0.001)
     # opt_G = torch.optim.RMSprop(G.parameters())
     opt_D = torch.optim.Adam(
         [{'params': D.D.parameters()}, {'params': D.FE1.parameters()}, {'params': D.FE2.parameters()}],
-        lr=learning_rate)
+        lr=0.0002)
     total_batch = int(mnist.train.num_examples / batch_size)
     now = datetime.datetime.now()
     now = '%02d_%02d_%02d_%02d' % (now.month, now.day, now.hour, now.minute)
@@ -169,7 +179,7 @@ if __name__ == "__main__":
 
             opt_G.zero_grad()
             D_fake, c_disc, c_cont = D(G(noise, label, code))
-            G_loss = torch.mean(torch.log(1-D_fake)) - Lambda * (
+            G_loss = -torch.mean(torch.log(D_fake)) - Lambda * (
                     torch.mean(label * torch.log(c_disc)) + NLL_Gaussian(c_cont))
             G_loss.backward(retain_graph=True)
             opt_G.step()
