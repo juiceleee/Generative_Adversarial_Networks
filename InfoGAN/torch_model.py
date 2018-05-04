@@ -155,8 +155,8 @@ if __name__ == "__main__":
     # opt_G = torch.optim.Adam(
     #     [{'params': G.parameters()}, {'params': Q.parameters()}],
     #     lr=0.0005)
-    opt_Q = torch.optim.Adam(Q.parameters(), lr=0.0005)
-    opt_G = torch.optim.Adam(G.parameters(), lr=0.0005)
+    opt_Q = torch.optim.Adam(Q.h4.parameters(), lr=0.0005)
+    opt_G = torch.optim.Adam([{'params': G.parameters()}, {'params': Q.h5.parameters()}], lr=0.0005)
     opt_D = torch.optim.Adam(
         [{'params': D_front.parameters()}, {'params': D.parameters()}],
         lr=0.0002)
