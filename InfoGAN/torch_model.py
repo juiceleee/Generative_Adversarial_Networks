@@ -16,7 +16,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 def NLL_Gaussian(input):
     mean = torch.mean(input, dim=0)
     sigma = torch.std(input, dim=0)
-    sigma = sigma * sigma
+    sigma = sigma * sigma + 0.00001
     loss = torch.mean(0.5 * torch.log(sigma) + torch.mean((input - mean) ** 2.0 / 2.0 / sigma, dim=0))
     return loss
 
@@ -134,6 +134,7 @@ def make_noise(batch_size, noise_n):
 if __name__ == "__main__":
     torch.set_printoptions(profile="full")
     torch.manual_seed(1234)
+    np.random.seed(1234)
 
     mnist = input_data.read_data_sets("../MNIST_data/")
 
@@ -149,11 +150,12 @@ if __name__ == "__main__":
     Q = Q_net().cuda()
     opt_G = torch.optim.Adam(
         [{'params': G.parameters()}, {'params': Q.parameters()}],
-        lr=0.001)
-    # opt_G = torch.optim.RMSprop(G.parameters())
+        lr=0.0002)
+    # opt_G = torch.optim.Adam(G.parameters(), lr=0.001)
     opt_D = torch.optim.Adam(
         [{'params': D_front.parameters()}, {'params': D.parameters()}],
         lr=0.0002)
+    # opt_D = torch.optim.Adam(D.parameters(), lr=0.0002)
     total_batch = int(mnist.train.num_examples / batch_size)
     now = datetime.datetime.now()
     now = '%02d_%02d_%02d_%02d' % (now.month, now.day, now.hour, now.minute)
@@ -195,7 +197,7 @@ if __name__ == "__main__":
             real_c_disc, real_c_cont = Q(D_front(X))
             class_loss = torch.mean(label * torch.log(c_disc)) + torch.mean(label * torch.log(real_c_disc))
             cont_loss = NLL_Gaussian(c_cont) + NLL_Gaussian(real_c_cont)
-            G_loss = -torch.mean(torch.log(D_fake)) - Lambda * (class_loss + cont_loss)
+            G_loss = -torch.mean(torch.log(D_fake)) - Lambda * (6 * class_loss + cont_loss)
             G_loss.backward(retain_graph=True)
             opt_G.step()
             # for name, param in G.named_parameters():
@@ -213,6 +215,9 @@ if __name__ == "__main__":
                          torch.reshape(
                              G.eval()(test_noise, one_hot([5]), test_code),
                              (28, 28)))
+        print("Epoch : {}".format(epoch))
+        classification, _ = Q(D_front(G(test_noise, one_hot([5]), test_code)))
+        print("Classification : {}".format(classification))
         # print(F.mse_loss(torch.argmax(D(X)[1], dim=1), torch.argmax(label, dim=1)))
         os.makedirs('models/{}'.format(now), exist_ok=True)
         torch.save(D, 'models/{}/D_{}.pt'.format(now, epoch))
