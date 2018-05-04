@@ -17,7 +17,7 @@ def NLL_Gaussian(input):
     mean = torch.mean(input, dim=0)
     sigma = torch.std(input, dim=0)
     sigma = sigma * sigma
-    loss = torch.mean(0.5 * torch.log(sigma) + torch.mean((input - mean) ** 2 / 2 / sigma, dim=0))
+    loss = torch.mean(0.5 * torch.log(sigma) + torch.mean((input - mean) ** 2.0 / 2.0 / sigma, dim=0))
     return loss
 
 
@@ -32,6 +32,70 @@ def one_hot(labels):
 
 # for Discriminator
 
+class D_pre(nn.Module):
+
+    def __init__(self):
+        super(D_pre, self).__init__()
+        self.pad = nn.ReplicationPad2d(1)
+        self.lRelu = nn.LeakyReLU(0.1)
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=64, kernel_size=(4, 4), stride=2)
+        self.conv2 = (nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(4, 4), stride=2))
+        self.bn_conv = (nn.BatchNorm2d(128))
+        self.fc1 = (nn.Linear(in_features=7 * 7 * 128, out_features=1024))
+        self.bn_fc = (nn.BatchNorm1d(1024))
+        for params in self.parameters():
+            if len(params.size()) >= 2:
+                nn.init.xavier_normal_(params.data)
+        # 2 for continuous latent codes, 10 for category.
+        # For this task, we use 1 ten-dimensional categorical code, 2 continuous
+        # latent codes and 62 noise variables, resulting in a concatenated dimension of 74.
+
+    def forward(self, *input):
+        x = input[0]
+        # x = torch.reshape(x, (-1, 1, 28, 28))
+        x = self.pad(x)
+        x = self.conv1(x)
+        x = self.lRelu(x)
+        x = self.pad(x)
+        x = self.conv2(x)
+        x = self.lRelu(x)
+        x = self.bn_conv(x)
+        x = torch.reshape(x, (-1, 7 * 7 * 128))
+        x = self.fc1(x)
+        x = self.lRelu(x)
+        x = self.bn_fc(x)
+        return x
+
+class D_out(nn.Module):
+    def __init__(self):
+        super(D_out, self).__init__()
+        self.fc1 = nn.Linear(1024, 1)
+
+    def forward(self, *input):
+        x = input[0]
+        x = self.fc1(x)
+        x = F.sigmoid(x)
+        return x
+
+class Q_out(nn.Module):
+    def __init__(self):
+        super(Q_out, self).__init__()
+        self.fc1 = nn.Linear(1024, 128)
+        self.bn1 = nn.BatchNorm1d(128)
+        self.lRelu = nn.LeakyReLU(0.1)
+        self.fc_disc = nn.Linear(128, 10)
+        self.fc_cont = nn.Linear(128, 2)
+
+    def forward(self, *input):
+        x = input[0]
+        x = self.fc1(x)
+        x = self.bn1(x)
+        x = self.lRelu(x)
+        disc_out = self.fc_disc(x)
+        cont_out = self.fc_cont(x)
+        return F.softmax(disc_out, dim=1), F.sigmoid(cont_out)
+
+
 class Discriminator(nn.Module):
 
     def __init__(self):
@@ -41,14 +105,14 @@ class Discriminator(nn.Module):
         lRelu = nn.LeakyReLU(0.1)
         fe1.append(pad)
         fe1.append(nn.Conv2d(in_channels=1, out_channels=64, kernel_size=(4, 4), stride=2))
-        fe1.append(nn.LeakyReLU(0.1))
+        fe1.append(nn.LeakyReLU(0.1, inplace=True))
         fe1.append(pad)
         fe1.append(nn.Conv2d(in_channels=64, out_channels=128, kernel_size=(4, 4), stride=2))
-        fe1.append(nn.LeakyReLU(0.1))
+        fe1.append(nn.LeakyReLU(0.1, inplace=True))
         fe1.append(nn.BatchNorm2d(128))
         fe2 = list()
         fe2.append(nn.Linear(in_features=7 * 7 * 128, out_features=1024))
-        fe2.append(nn.LeakyReLU(0.1))
+        fe2.append(nn.LeakyReLU(0.1, inplace=True))
         fe2.append(nn.BatchNorm1d(1024))
         self.FE1 = nn.Sequential(*fe1)
         self.FE2 = nn.Sequential(*fe2)
@@ -57,7 +121,7 @@ class Discriminator(nn.Module):
         q = list()
         q.append(nn.Linear(1024, 128))
         q.append(nn.BatchNorm1d(128))
-        q.append(nn.LeakyReLU(0.1))
+        q.append(nn.LeakyReLU(0.1, inplace=True))
         # q.append(nn.Linear(128, 12))
         self.Q = nn.Sequential(*q)
         self.Q_cont = nn.Sequential(nn.Linear(128, 2), nn.Sigmoid())
@@ -94,12 +158,12 @@ class Generator(nn.Module):
         self.fc1 = nn.Linear(noise_n + 12, 1024, True)
         # nn.init.xavier_normal_(self.fc1.weight)
         self.bn1 = nn.BatchNorm1d(1024)
-        self.fc2 = nn.Linear(1024, 7 * 7 * 128)
-        self.bn2 = nn.BatchNorm1d(7 * 7 * 128)
-        self.h1 = nn.ConvTranspose2d(128, 64, kernel_size=(4, 4), stride=2, padding=1)  # 7,7 -> 14,14
-        self.bn3 = nn.BatchNorm2d(64)
+        self.fc2 = nn.Linear(1024, 7 * 7 * 16)
+        self.bn2 = nn.BatchNorm1d(7 * 7 * 16)
+        self.h1 = nn.ConvTranspose2d(16, 4, kernel_size=(2, 2), stride=2)  # 7,7 -> 14,14
+        self.bn3 = nn.BatchNorm2d(4)
         # nn.init.xavier_normal_(self.h1.weight)
-        self.h2 = nn.ConvTranspose2d(64, 1, kernel_size=(4, 4), stride=2, padding=1)  # 14,14 -> 28,28
+        self.h2 = nn.ConvTranspose2d(4, 1, kernel_size=(2, 2), stride=2)  # 14,14 -> 28,28
         # nn.init.xavier_normal_(self.h2.weight)
         for params in self.parameters():
             if len(params.size()) >= 2:
@@ -117,7 +181,7 @@ class Generator(nn.Module):
         x = self.fc2(x)
         x = F.relu(x)
         x = self.bn2(x)
-        x = torch.reshape(x, (-1, 128, 7, 7))
+        x = torch.reshape(x, (-1, 16, 7, 7))
         x = self.h1(x)
         x = F.relu(x)
         x = self.bn3(x)
@@ -139,18 +203,19 @@ if __name__ == "__main__":
     Lambda = 0
     learning_rate = 0.0002
     training_epochs = 1000
-    batch_size = 64
+    batch_size = 256
     noise_n = 62
     flag = 0
     G = Generator().cuda()
-    D = Discriminator().cuda()
+    D_front = D_pre().cuda()
+    D = D_out().cuda()
+    Q = Q_out().cuda()
     opt_G = torch.optim.Adam(
-        [{'params': G.parameters()}, {'params': D.Q.parameters()},
-         {'params': D.Q_disc.parameters()}, {'params': D.Q_cont.parameters()}],
+        [{'params': G.parameters()}, {'params': Q.parameters()}],
         lr=0.001)
     # opt_G = torch.optim.RMSprop(G.parameters())
     opt_D = torch.optim.Adam(
-        [{'params': D.D.parameters()}, {'params': D.FE1.parameters()}, {'params': D.FE2.parameters()}],
+        [{'params': D_front.parameters()}, {'params': D.parameters()}],
         lr=0.0002)
     total_batch = int(mnist.train.num_examples / batch_size)
     now = datetime.datetime.now()
@@ -161,29 +226,41 @@ if __name__ == "__main__":
         for i in range(total_batch):
             G.train()
             D.train()
+            Q.train()
+            D_front.train()
             X, label = mnist.train.next_batch(batch_size, shuffle=True)
             label = one_hot(label)
+            label.requires_grad_()
             X = torch.Tensor(X).cuda()
             X.requires_grad_()
             X = torch.reshape(X, (-1, 1, 28, 28))
 
             noise = torch.Tensor(make_noise(batch_size, noise_n)).cuda()
             code = torch.Tensor(make_noise(batch_size, 2)).cuda()
+            code.requires_grad_()
             noise.requires_grad_()
+
             opt_D.zero_grad()
-            D_real, _, _ = D(X)
-            D_fake, _, _ = D(G(noise, label, code))
+            # D_real, _, _ = D(X)
+            D_real = D(D_front(X))
+            pre_fake = D_front(G(noise, label, code))
+            # D_fake, _, _ = D((G(noise, label, code)))
+            D_fake = D(pre_fake)
             D_loss = -(torch.mean(torch.log(D_real) + torch.log(1 - D_fake)))
             D_loss.backward(retain_graph=True)
             opt_D.step()
 
             opt_G.zero_grad()
-            D_fake, c_disc, c_cont = D(G(noise, label, code))
+            pre_fake = D_front(G(noise, label, code))
+            # D_fake, c_disc, c_cont = D(G(noise, label, code))
+            D_fake = D(pre_fake)
+            c_disc, c_cont = Q(pre_fake)
             G_loss = -torch.mean(torch.log(D_fake)) - Lambda * (
                     torch.mean(label * torch.log(c_disc)) + NLL_Gaussian(c_cont))
             G_loss.backward(retain_graph=True)
             opt_G.step()
-
+            # for name, param in G.named_parameters():
+            #     writer.add_histogram(name, param, i + epoch * total_batch)
             if i % 10 == 0:
                 writer.add_scalar("D_loss", D_loss, i + epoch * total_batch)
                 writer.add_scalar("G_loss", G_loss, i + epoch * total_batch)
