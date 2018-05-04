@@ -8,6 +8,7 @@ import torch.nn.functional as F
 from tensorboardX import SummaryWriter
 import os
 
+import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
 
@@ -134,8 +135,10 @@ def make_noise(batch_size, noise_n):
 
 if __name__ == "__main__":
     torch.set_printoptions(profile="full")
+    tf.set_random_seed(123)
     torch.manual_seed(123)
     np.random.seed(123)
+
 
     mnist = input_data.read_data_sets("../MNIST_data/")
 
@@ -233,7 +236,7 @@ if __name__ == "__main__":
         print("Classification : {}".format(classification))
         # print(F.mse_loss(torch.argmax(D(X)[1], dim=1), torch.argmax(label, dim=1)))
         os.makedirs('models/{}'.format(now), exist_ok=True)
-        torch.save(D, 'models/{}/D_{}.pt'.format(now, epoch))
-        torch.save(G, 'models/{}/G_{}.pt'.format(now, epoch))
+        torch.save((D_front, D, Q, G), 'models/{}/Epoch_{}.pt'.format(now, epoch))
+        # torch.save(G, 'models/{}/{}.pt'.format(now, epoch))
 
     print('Learning finished')
