@@ -192,7 +192,7 @@ if __name__ == "__main__":
             opt_D.step()
 
             opt_Q.zero_grad()
-            Q_loss = -torch.mean(label * torch.log(Q(D_front(X))))
+            Q_loss = -torch.mean(label * torch.log(Q(D_front(X))[0]))
             Q_loss.backward(retain_graph=True)
             opt_Q.step()
 
