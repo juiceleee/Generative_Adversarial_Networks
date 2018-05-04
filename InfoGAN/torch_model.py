@@ -16,7 +16,7 @@ from tensorflow.examples.tutorials.mnist import input_data
 def NLL_Gaussian(input):
     mean = torch.mean(input, dim=0)
     sigma = torch.std(input, dim=0)
-    sigma = sigma * sigma + 0.00001
+    sigma = sigma * sigma
     loss = torch.mean(0.5 * torch.log(sigma) + torch.mean((input - mean) ** 2.0 / 2.0 / sigma, dim=0))
     return loss
 
@@ -45,7 +45,7 @@ class Discriminator_pre(nn.Module):
         # self.h3.weight.data.normal_(0, 0.01)
         # self.h4 = nn.Linear(in_features=625, out_features=1)
         # self.h4.weight.data.normal_(0, 0.01)
-        # self.dropout = nn.Dropout(p=0.5)
+        self.dropout = nn.Dropout(p=0.3)
 
     def forward(self, *input):
         x = input[0]
@@ -57,6 +57,7 @@ class Discriminator_pre(nn.Module):
         x = self.h2.forward(x)
         x = F.relu(x)
         x = torch.reshape(x, (-1, 28 * 28 * 64))
+        x = self.dropout(x)
         x = self.h3.forward(x)
         x = F.relu(x)
         # x = self.h4.forward(x)
@@ -133,25 +134,26 @@ def make_noise(batch_size, noise_n):
 
 if __name__ == "__main__":
     torch.set_printoptions(profile="full")
-    torch.manual_seed(1234)
-    np.random.seed(1234)
+    torch.manual_seed(123)
+    np.random.seed(123)
 
     mnist = input_data.read_data_sets("../MNIST_data/")
 
-    Lambda = 1
+    Lambda = 3
     learning_rate = 0.0002
     training_epochs = 1000
     batch_size = 256
     noise_n = 62
-    flag = 0
+    alpha = 1e-05
     G = Generator().cuda()
     D_front = Discriminator_pre().cuda()
     D = Discriminator().cuda()
     Q = Q_net().cuda()
-    opt_G = torch.optim.Adam(
-        [{'params': G.parameters()}, {'params': Q.parameters()}],
-        lr=0.0002)
-    # opt_G = torch.optim.Adam(G.parameters(), lr=0.001)
+    # opt_G = torch.optim.Adam(
+    #     [{'params': G.parameters()}, {'params': Q.parameters()}],
+    #     lr=0.0005)
+    opt_Q = torch.optim.Adam(Q.parameters(), lr=0.0005)
+    opt_G = torch.optim.Adam(G.parameters(), lr=0.0005)
     opt_D = torch.optim.Adam(
         [{'params': D_front.parameters()}, {'params': D.parameters()}],
         lr=0.0002)
@@ -185,9 +187,14 @@ if __name__ == "__main__":
             pre_fake = D_front(G(noise, label, code))
             # D_fake, _, _ = D((G(noise, label, code)))
             D_fake = D(pre_fake)
-            D_loss = -(torch.mean(torch.log(D_real) + torch.log(1 - D_fake)))
+            D_loss = -(torch.mean(torch.log(D_real+alpha) + torch.log(1 - D_fake+alpha)))
             D_loss.backward(retain_graph=True)
             opt_D.step()
+
+            opt_Q.zero_grad()
+            Q_loss = -torch.mean(label * torch.log(Q(D_front(X))))
+            Q_loss.backward(retain_graph=True)
+            opt_Q.step()
 
             opt_G.zero_grad()
             pre_fake = D_front(G(noise, label, code))
@@ -195,26 +202,32 @@ if __name__ == "__main__":
             D_fake = D(pre_fake)
             c_disc, c_cont = Q(pre_fake)
             real_c_disc, real_c_cont = Q(D_front(X))
-            class_loss = torch.mean(label * torch.log(c_disc)) + torch.mean(label * torch.log(real_c_disc))
-            cont_loss = NLL_Gaussian(c_cont) + NLL_Gaussian(real_c_cont)
-            G_loss = -torch.mean(torch.log(D_fake)) - Lambda * (6 * class_loss + cont_loss)
+            # class_loss = torch.mean(label * torch.log(c_disc+alpha)) + torch.mean(label * torch.log(real_c_disc+alpha))
+            # cont_loss = NLL_Gaussian(c_cont) + NLL_Gaussian(real_c_cont)
+            class_loss = torch.mean(label * torch.log(c_disc+alpha))
+            cont_loss = NLL_Gaussian(c_cont)
+            GAN_loss = torch.mean(torch.log(D_fake))
+            G_loss = - GAN_loss - Lambda * (2.0*class_loss + cont_loss)
             G_loss.backward(retain_graph=True)
             opt_G.step()
             # for name, param in G.named_parameters():
             #     writer.add_histogram(name, param, i + epoch * total_batch)
             if i % 10 == 0:
                 writer.add_scalar("D_loss", D_loss, i + epoch * total_batch)
+                writer.add_scalar("Q_loss", Q_loss, i + epoch * total_batch)
                 writer.add_scalar("G_loss", G_loss, i + epoch * total_batch)
                 writer.add_scalar("class_loss", class_loss, i + epoch * total_batch)
                 writer.add_scalar("cont_loss", cont_loss, i + epoch * total_batch)
+                writer.add_scalar("GAN_loss", GAN_loss, i + epoch * total_batch)
             if i % 100 == 0:
                 print("EPOCH : {}, BATCH: {}\n".format(epoch, i), "D_loss : {}, G_loss : {}".format(D_loss, G_loss))
         test_noise = torch.unsqueeze(noise[batch_size // 2], 0)
         test_code = torch.unsqueeze(code[batch_size // 2], 0)
-        writer.add_image("Epoch:{}".format(epoch),
+        for i in range(10):
+            writer.add_image("Epoch_{}".format(epoch),
                          torch.reshape(
-                             G.eval()(test_noise, one_hot([5]), test_code),
-                             (28, 28)))
+                             G.eval()(test_noise, one_hot([i]), test_code),
+                             (28, 28)), i)
         print("Epoch : {}".format(epoch))
         classification, _ = Q(D_front(G(test_noise, one_hot([5]), test_code)))
         print("Classification : {}".format(classification))
