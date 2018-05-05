@@ -34,6 +34,40 @@ tensorflow-tensorboard==0.4.0rc3
     - G
       + FC(100, 256), Relu, BatchNorm
       + FC(256, 512), Relu, BatchNorm
-      + FC(512, 28*28), Sigmoid
+      + FC(512, 28*28)
+      + Sigmoid
   * DCGAN
+    - D
+      + Conv2d(1, 32, 3, 1), Relu
+      + Conv2d(32, 64, 3, 1), Relu
+      + FC(28*28*64, 625)
+      + FC(625, 1)
+      + dropout(0.5)
+      + Sigmoid
+    - G
+      + FC(100, 7*7*16)
+      + ConvTranspose2d(16, 4, 2, 2), Relu, BatchNorm
+      + ConvTranspose2d(4, 1, 2, 2)
+      + Sigmoid
   * InfoGAN
+    - D_front
+      + Conv2d(1, 32, 3, 1), LeakyRelu(0.1)
+      + Conv2d(32, 64, 3, 1), LeakyRelu(0.1)
+      + dropout(0.3)
+      + FC(28*28*64, 625), LeakyRelu(0.1)
+      - for D
+        + D_front
+        + FC(625, 1)
+        + dropout(0.5)
+        + Sigmoid
+      - for Q_class
+        + D_front
+        + FC(625, 10), Softmax
+      - for Q_cont
+        + D_front
+        + FC(625, 2), Sigmoid
+    - G
+      + FC(62+12, 7*7*16)
+      + ConvTranspose2d(16, 4, 2, 2), Relu, BatchNorm
+      + ConvTranspose2d(4, 1, 2, 2)
+      + Sigmoid
