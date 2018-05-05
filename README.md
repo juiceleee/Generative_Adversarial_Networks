@@ -2,18 +2,20 @@
 
 Various GAN networks implemented with tensorflow/pytorch
 
-Overall
-=======
+* Pytorch Implementation: [**Yoo Jaehoon**](https://github.com/Ugness/)
 
-Contents
-========
+* Tensorflow Implementation: [**juiceleee**](https://github.com/juiceleee/)
 
-Vanilla_GAN
-===========
+# Reference
+* Vanilla_GAN : [**https://arxiv.org/abs/1406.2661**]
 
+* DCGAN : [**https://arxiv.org/abs/1511.06434**]
 
-DCGAN
-=====
+* InfoGAN : [**https://arxiv.org/abs/1606.03657**]
 
-InfoGAN
-=======
+# Usage
+
+# Network Architecture
+  * Vanilla_GAN
+  * DCGAN
+  * InfoGAN
