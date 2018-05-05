@@ -6,12 +6,9 @@ Various GAN networks implemented with tensorflow/pytorch
 
 * Tensorflow Implementation: [**juiceleee**](https://github.com/juiceleee/)
 
-# Reference
-* Vanilla_GAN : [**https://arxiv.org/abs/1406.2661**]
+# Result of InfoGAN-pytorch
+![Alt text](/result67.png)
 
-* DCGAN : [**https://arxiv.org/abs/1511.06434**]
-
-* InfoGAN : [**https://arxiv.org/abs/1606.03657**]
 
 # Requirements
 ```
@@ -73,3 +70,10 @@ Architectures are Different with Papers
       + ConvTranspose2d(16, 4, 2, 2), Relu, BatchNorm
       + ConvTranspose2d(4, 1, 2, 2)
       + Sigmoid
+      
+# Reference
+* Vanilla_GAN : [**https://arxiv.org/abs/1406.2661**]
+
+* DCGAN : [**https://arxiv.org/abs/1511.06434**]
+
+* InfoGAN : [**https://arxiv.org/abs/1606.03657**]
