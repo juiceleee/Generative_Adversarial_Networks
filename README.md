@@ -23,6 +23,8 @@ tensorflow-tensorboard==0.4.0rc3
 ```
 
 # Pytorch Network Architecture
+
+Architectures may Different with Papers
   * Vanilla_GAN
     - D
       + Conv2d(1, 32, 3, 1), Relu
