@@ -13,6 +13,15 @@ Various GAN networks implemented with tensorflow/pytorch
 
 * InfoGAN : [**https://arxiv.org/abs/1606.03657**]
 
+# Requirements
+```
+opencv-python==3.3.0.10
+Pillow==4.3.0
+torch==0.4.0
+tensorflow-gpu==1.7.0
+tensorflow-tensorboard==0.4.0rc3
+```
+
 # Usage
 
 # Network Architecture
