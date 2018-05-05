@@ -22,9 +22,18 @@ tensorflow-gpu==1.7.0
 tensorflow-tensorboard==0.4.0rc3
 ```
 
-# Usage
-
-# Network Architecture
+# Pytorch Network Architecture
   * Vanilla_GAN
+    - D
+      + Conv2d(1, 32, 3, 1), Relu
+      + Conv2d(32, 64, 3, 1), Relu
+      + FC(28*28*64, 625)
+      + FC(625, 1)
+      + dropout(0.5)
+      + Sigmoid
+    - G
+      + FC(100, 256), Relu, BatchNorm
+      + FC(256, 512), Relu, BatchNorm
+      + FC(512, 28*28), Sigmoid
   * DCGAN
   * InfoGAN
